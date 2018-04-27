@@ -1,0 +1,29 @@
+{
+  "build":{
+    "deps":[]
+  },
+    "deploy":{
+        "monique":{
+          "scheduler-in" : {
+              "host": "localhost",
+              "comport": 9000,
+              "techport": 9024
+          },
+          "scheduler-out" : {
+              "host": "localhost",
+              "comport": 9001,
+              "techport": 9025
+          }
+        }
+    }  
+  ,
+    "params":{
+        "mq_controller": {
+          "creator": "0000-0000-0000-controller",
+          "logfile": "/tmp/controller.log",
+          "frequency": 60000,
+          "connections": 
+            {"example_simple": 10000} 
+        }
+    }
+}
