@@ -23,7 +23,7 @@
           "logfile": "/tmp/controller.log",
           "frequency": 60000,
           "connections": 
-            {"example_simple": 10000} 
+            {"example_clock": 10000} 
         }
     }
 }
