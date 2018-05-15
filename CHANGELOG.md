@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.1.0] - 2018-05-18
+### Changed
+- New error type.
+- Logic for processing controllers.
+
 ## [0.1.0.1] - 2018-05-15
 ### Changed
 - Fix
