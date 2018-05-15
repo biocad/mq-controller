@@ -5,22 +5,19 @@ module System.MQ.Controller
   , runController
   ) where
 
-import           Control.Monad                 (when)
-import           Control.Monad.IO.Class        (liftIO)
-import qualified Data.ByteString.Char8         as BSC8 (unpack)
-import           Data.String                   (fromString)
-import           System.Log.Logger             (infoM)
-import           System.MQ.Component           (Env (..), TwoChannels (..),
-                                                load2Channels)
-import           System.MQ.Component.Transport (push, sub)
-import           System.MQ.Monad               (MQMonad, foreverSafe)
-import           System.MQ.Protocol            (Condition (..), Message (..),
-                                                MessageTag, MessageType (..),
-                                                Spec, matches, messageSpec,
-                                                messageType)
-import           System.MQ.Transport           (HostPort (..), Port,
-                                                PushChannel, anyHost, bindTo,
-                                                context)
+import           Control.Monad          (when)
+import           Control.Monad.IO.Class (liftIO)
+import qualified Data.ByteString.Char8  as BSC8 (unpack)
+import           Data.String            (fromString)
+import           System.Log.Logger      (infoM)
+import           System.MQ.Component    (Env (..), TwoChannels (..),
+                                         load2Channels, push, sub)
+import           System.MQ.Monad        (MQMonad, foreverSafe)
+import           System.MQ.Protocol     (Condition (..), Message (..),
+                                         MessageTag, MessageType (..), Spec,
+                                         matches, messageSpec, messageType)
+import           System.MQ.Transport    (HostPort (..), Port, PushChannel,
+                                         anyHost, bindTo, context)
 
 -- | Configuration to run controller
 --
