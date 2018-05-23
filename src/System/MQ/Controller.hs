@@ -25,7 +25,7 @@ import           System.MQ.Protocol    (Condition (..), Message (..),
                                         MessageTag, MessageType (..), Spec,
                                         matches, messageSpec, messageType)
 import           System.MQ.Transport   (HostPort (..), Port, PushChannel,
-                                        anyHost, bindTo, context)
+                                        anyHost, bindTo, contextM)
 
 -- | Map that maps specs of messages to ports to which controllers that handle these messages bind
 --
@@ -81,7 +81,7 @@ startController env@Env{..} ControllerConfig{..} = runMQ $ do
   where
     connectController :: Port -> MQMonad PushChannel
     connectController port' = do
-        context' <- liftIO context
+        context' <- contextM
         bindTo (HostPort anyHost port') context'
 
     filterMsg :: MessageTag -> Bool
