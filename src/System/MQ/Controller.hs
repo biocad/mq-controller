@@ -18,14 +18,14 @@ import           Data.Text             (pack)
 import           System.BCD.Config     (getConfigText)
 import           System.Log.Logger     (infoM)
 import           System.MQ.Component   (Env (..), TwoChannels (..),
-                                        load2Channels, push, sub)
+                                        load2Channels)
 import           System.MQ.Monad       (MQMonad, errorHandler, foreverSafe,
                                         runMQMonad)
 import           System.MQ.Protocol    (Condition (..), Message (..),
                                         MessageTag, MessageType (..), Spec,
                                         matches, messageSpec, messageType)
 import           System.MQ.Transport   (HostPort (..), Port, PushChannel,
-                                        anyHost, bindTo, contextM)
+                                        anyHost, bindTo, contextM, push, sub)
 
 -- | Map that maps specs of messages to ports to which controllers that handle these messages bind
 --
@@ -69,14 +69,14 @@ runControllerS env@Env{..} = forever $ do
 -- | Given 'ControllerConfig' produces action to run on communication level
 --
 startController :: Env -> ControllerConfig -> IO ()
-startController env@Env{..} ControllerConfig{..} = runMQ $ do
+startController Env{..} ControllerConfig{..} = runMQ $ do
     TwoChannels{..} <- load2Channels
     toComponent     <- connectController port
 
     foreverSafe name $ do
-        (tag, msg@Message{..}) <- sub fromScheduler env
+        (tag, msg@Message{..}) <- sub fromScheduler
         liftIO $ infoM name $ "Received message with id: " ++ BSC8.unpack msgId
-        when (filterMsg tag) (push toComponent env msg >> liftIO (infoM name $ "Sent message with id: " ++ BSC8.unpack msgId))
+        when (filterMsg tag) (push toComponent msg >> liftIO (infoM name $ "Sent message with id: " ++ BSC8.unpack msgId))
 
   where
     connectController :: Port -> MQMonad PushChannel
