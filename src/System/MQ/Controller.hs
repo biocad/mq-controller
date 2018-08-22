@@ -10,11 +10,9 @@ import           Control.Monad         (forever, when)
 import           Control.Monad.Except  (catchError, liftIO)
 import           Control.Monad.State   (StateT, evalStateT, get, put)
 import           Data.Aeson.Picker     ((|--))
-import qualified Data.ByteString.Char8 as BSC8 (unpack)
 import           Data.Map.Strict       (Map)
 import qualified Data.Map.Strict       as M (difference, toList)
-import           Data.String           (fromString)
-import           Data.Text             (pack)
+import           Data.Text             (pack, unpack)
 import           System.BCD.Config     (getConfigText)
 import           System.Log.Logger     (infoM)
 import           System.MQ.Component   (Env (..), TwoChannels (..),
@@ -25,7 +23,8 @@ import           System.MQ.Protocol    (Condition (..), Message (..),
                                         MessageTag, MessageType (..), Spec,
                                         matches, messageSpec, messageType)
 import           System.MQ.Transport   (HostPort (..), Port, PushChannel,
-                                        anyHost, bindTo, contextM, push, sub)
+                                        Subscribe (..), anyHost, bindTo,
+                                        contextM, push, sub)
 
 -- | Map that maps specs of messages to ports to which controllers that handle these messages bind
 --
@@ -72,11 +71,13 @@ startController :: Env -> ControllerConfig -> IO ()
 startController Env{..} ControllerConfig{..} = runMQ $ do
     TwoChannels{..} <- load2Channels
     toComponent     <- connectController port
+    -- subscribe to only that messages that we are interested in
+    subscribeToTypeSpec fromScheduler Config spec
 
     foreverSafe name $ do
         (tag, msg@Message{..}) <- sub fromScheduler
-        liftIO $ infoM name $ "Received message with id: " ++ BSC8.unpack msgId
-        when (filterMsg tag) (push toComponent msg >> liftIO (infoM name $ "Sent message with id: " ++ BSC8.unpack msgId))
+        liftIO $ infoM name $ "Received message with id: " ++ unpack msgId
+        when (filterMsg tag) (push toComponent msg >> liftIO (infoM name $ "Sent message with id: " ++ unpack msgId))
 
   where
     connectController :: Port -> MQMonad PushChannel
@@ -85,7 +86,7 @@ startController Env{..} ControllerConfig{..} = runMQ $ do
         bindTo (HostPort anyHost port') context'
 
     filterMsg :: MessageTag -> Bool
-    filterMsg = (`matches` (messageType :== Config :&& messageSpec :== fromString spec))
+    filterMsg = (`matches` (messageType :== Config :&& messageSpec :== spec))
 
     runMQ :: MQMonad () -> IO ()
     runMQ = runMQMonad . (`catchError` errorHandler name)
